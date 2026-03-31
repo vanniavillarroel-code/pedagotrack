@@ -382,9 +382,11 @@
       <span class="tab-icon">📋</span> Registro de Percepción
     </button>
     <button class="tab-btn" onclick="switchTab('dashboard')" id="tab-dashboard">
-      <span class="tab-icon">📊</span> Dashboard de Análisis
+      <span class="tab-icon">📊</span> Dashboard de Reportes
     </button>
-
+    <button class="tab-btn" onclick="switchTab('percepcion')" id="tab-percepcion">
+      <span class="tab-icon">🎯</span> Dashboard de Percepción
+    </button>
   </div>
 
   <!-- ═══════════════════════════ TAB 1: SURVEY ═══════════════════════════ -->
@@ -831,6 +833,140 @@
     </div>
   </div>
 
+
+  <!-- ═══════════════════════════ TAB 3: PERCEPCIÓN ═══════════════════════════ -->
+  <div class="panel" id="panel-percepcion">
+
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-title"><span class="icon">🎯</span> Dashboard de Percepción · En tiempo real</div>
+      <div class="card-sub">Los datos se cargan automáticamente desde Google Sheets cada vez que abres esta pestaña.</div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <button class="btn btn-accent" onclick="cargarPercepcion()">🔄 Actualizar datos</button>
+        <div id="p-sync-status" style="font-size:0.8rem;color:var(--muted);">⚪ Sin cargar</div>
+      </div>
+    </div>
+
+    <div id="percepcion-empty">
+      <div class="empty-state">
+        <div class="empty-icon">🎯</div>
+        <h3>Sin datos cargados</h3>
+        <p>Exporta tu Google Sheet con las respuestas del formulario y súbelo aquí.</p>
+      </div>
+    </div>
+
+    <div id="percepcion-content" style="display:none">
+
+      <!-- KPIs -->
+      <div class="section-label">Indicadores de percepción</div>
+      <div class="stats-grid">
+        <div class="stat-card c1">
+          <div class="stat-label">Total Respuestas</div>
+          <div class="stat-value blue" id="p-total">—</div>
+          <div class="stat-change">Formularios recibidos</div>
+        </div>
+        <div class="stat-card c2">
+          <div class="stat-label">NPS Promedio</div>
+          <div class="stat-value teal" id="p-nps">—</div>
+          <div class="stat-change">Recomendación (0–10)</div>
+        </div>
+        <div class="stat-card c3">
+          <div class="stat-label">Satisfacción Global</div>
+          <div class="stat-value orange" id="p-satisfaccion">—</div>
+          <div class="stat-change">Promedio (1–5)</div>
+        </div>
+        <div class="stat-card c4">
+          <div class="stat-label">Usabilidad</div>
+          <div class="stat-value green" id="p-usabilidad">—</div>
+          <div class="stat-change">Promedio sección 1</div>
+        </div>
+        <div class="stat-card c5">
+          <div class="stat-label">Contenido</div>
+          <div class="stat-value yellow" id="p-contenido">—</div>
+          <div class="stat-change">Promedio sección 2</div>
+        </div>
+        <div class="stat-card c6">
+          <div class="stat-label">Impacto</div>
+          <div class="stat-value" style="color:var(--accent)" id="p-impacto">—</div>
+          <div class="stat-change">Promedio sección 3</div>
+        </div>
+      </div>
+
+      <!-- Charts row 1 -->
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header"><div>
+            <div class="chart-title">Distribución NPS</div>
+            <div class="chart-sub">Probabilidad de recomendación (0–10)</div>
+          </div></div>
+          <div class="chart-wrap"><canvas id="p-chart-nps"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div>
+            <div class="chart-title">Satisfacción Global</div>
+            <div class="chart-sub">Distribución de estrellas (1–5)</div>
+          </div></div>
+          <div class="chart-wrap"><canvas id="p-chart-satisfaccion"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Charts row 2 -->
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header"><div>
+            <div class="chart-title">Promedio por Sección</div>
+            <div class="chart-sub">Usabilidad · Contenido · Impacto</div>
+          </div></div>
+          <div class="chart-wrap"><canvas id="p-chart-secciones"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div>
+            <div class="chart-title">Función Más Usada</div>
+            <div class="chart-sub">Repasar / Microevaluaciones / Diálogo</div>
+          </div></div>
+          <div class="chart-wrap"><canvas id="p-chart-funciones"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Charts row 3 -->
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header"><div>
+            <div class="chart-title">Distribución por Carrera</div>
+            <div class="chart-sub">Estudiantes por carrera registrada</div>
+          </div></div>
+          <div class="chart-wrap"><canvas id="p-chart-carreras"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div>
+            <div class="chart-title">Frecuencia de Uso</div>
+            <div class="chart-sub">¿Con qué frecuencia usan la app?</div>
+          </div></div>
+          <div class="chart-wrap"><canvas id="p-chart-frecuencia"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Respuestas cualitativas -->
+      <div class="section-label" style="margin-top:8px">Respuestas cualitativas</div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header"><div>
+            <div class="chart-title">💬 ¿Qué valoran más?</div>
+            <div class="chart-sub">Respuestas abiertas de los estudiantes</div>
+          </div></div>
+          <div id="p-positivos" style="max-height:280px;overflow-y:auto;font-size:0.82rem;line-height:1.8;color:var(--muted)"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div>
+            <div class="chart-title">🔧 ¿Qué mejorarían?</div>
+            <div class="chart-sub">Sugerencias de mejora</div>
+          </div></div>
+          <div id="p-mejoras" style="max-height:280px;overflow-y:auto;font-size:0.82rem;line-height:1.8;color:var(--muted)"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div><!-- /app-wrapper -->
 
 <!-- TOAST -->
@@ -875,7 +1011,7 @@ function switchTab(tab) {
 // ──────────────────────────────────────────────
 // GOOGLE SHEETS URL
 // ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLWTbvBjv-xy6PxQjvgoIb9qzhZeniuYr6mD3-Wj2TRQxVna-3tNxxQu4OMKmVKOF7/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxq14Hu5fUsvFkd-bzoD0ehjN7zJrsbVEGV8Ml1ysweV-RPHvBZSf56rRCJO_KP4FwC/exec';
 
 // ──────────────────────────────────────────────
 // SURVEY SUBMIT
@@ -1221,6 +1357,179 @@ function renderDashboard(){
 
   showToast('Dashboard generado correctamente 🎉','ok');
   switchTab('dashboard');
+}
+
+
+// ──────────────────────────────────────────────
+// PERCEPCIÓN DASHBOARD — carga desde Google Sheets
+// ──────────────────────────────────────────────
+let pCharts = {};
+function destroyPChart(id){ if(pCharts[id]){ pCharts[id].destroy(); delete pCharts[id]; } }
+
+async function cargarPercepcion(){
+  const status = document.getElementById('p-sync-status');
+  status.innerHTML = '⏳ Cargando datos...';
+  status.style.color = 'var(--warning)';
+  try {
+    const res = await fetch(SCRIPT_URL, { method:'GET', mode:'no-cors' });
+    // no-cors no devuelve body, usar iframe trick o jsonp
+    // Usamos una alternativa: fetch con ?callback para JSONP
+    const url = SCRIPT_URL + '?t=' + Date.now();
+    const resp = await fetch(url);
+    const data = await resp.json();
+    if(!Array.isArray(data) || data.length === 0){
+      status.innerHTML = '⚠️ Sin respuestas aún';
+      status.style.color = 'var(--warning)';
+      showToast('No hay respuestas registradas todavía','err');
+      return;
+    }
+    status.innerHTML = '🟢 ' + data.length + ' respuestas cargadas';
+    status.style.color = 'var(--success)';
+    renderPercepcion(data);
+    showToast('Dashboard actualizado 🎯','ok');
+  } catch(err) {
+    status.innerHTML = '🔴 Error de conexión';
+    status.style.color = 'var(--danger)';
+    showToast('No se pudo conectar con Google Sheets','err');
+  }
+}
+
+// Auto-cargar al abrir la pestaña
+const _origSwitchTab = switchTab;
+function switchTab(tab){
+  _origSwitchTab(tab);
+  if(tab === 'percepcion') cargarPercepcion();
+}
+
+function avg(data, keys){
+  const vals = [];
+  data.forEach(r => {
+    keys.forEach(k => {
+      const v = parseFloat(r[k]);
+      if(!isNaN(v)) vals.push(v);
+    });
+  });
+  return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2) : '—';
+}
+
+function freqChart(canvasId, data, key, label){
+  destroyPChart(canvasId);
+  const freq = {};
+  data.forEach(r => { const v = String(r[key]||'Sin dato').trim(); if(v) freq[v]=(freq[v]||0)+1; });
+  const sorted = Object.entries(freq).sort((a,b)=>b[1]-a[1]);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  pCharts[canvasId] = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels: sorted.map(x=>x[0]),
+      datasets:[{ label, data: sorted.map(x=>x[1]),
+        backgroundColor: COLORS.slice(0,sorted.length), borderWidth:0, borderRadius:6 }]
+    },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
+  });
+}
+
+function renderPercepcion(data){
+  document.getElementById('percepcion-empty').style.display = 'none';
+  document.getElementById('percepcion-content').style.display = 'block';
+
+  // Find column keys dynamically
+  const keys = data.length ? Object.keys(data[0]) : [];
+  const find = (...terms) => keys.find(k => terms.some(t => k.toLowerCase().includes(t))) || '';
+
+  const kNps        = find('nps');
+  const kSat        = find('satisfaccion','satisfacción');
+  const kFuncion    = find('funcion','función');
+  const kCarrera    = find('carrera');
+  const kFrecuencia = find('frecuencia');
+  const kPositivo   = find('positivo','valoras','valor');
+  const kMejora     = find('mejora','mejorar','agregarías');
+
+  const q1keys = keys.filter(k => k.startsWith('q1'));
+  const q2keys = keys.filter(k => k.startsWith('q2'));
+  const q3keys = keys.filter(k => k.startsWith('q3'));
+
+  // KPIs
+  document.getElementById('p-total').textContent = data.length;
+  document.getElementById('p-nps').textContent = kNps ? avg(data,[kNps]) : '—';
+  document.getElementById('p-satisfaccion').textContent = kSat ? avg(data,[kSat]) : '—';
+  document.getElementById('p-usabilidad').textContent = q1keys.length ? avg(data,q1keys) : '—';
+  document.getElementById('p-contenido').textContent  = q2keys.length ? avg(data,q2keys) : '—';
+  document.getElementById('p-impacto').textContent    = q3keys.length ? avg(data,q3keys) : '—';
+
+  // NPS chart
+  if(kNps){
+    destroyPChart('p-chart-nps');
+    const freq = {};
+    data.forEach(r => { const v = String(r[kNps]||'').trim(); if(v) freq[v]=(freq[v]||0)+1; });
+    const sorted = Object.entries(freq).sort((a,b)=>parseInt(a[0])-parseInt(b[0]));
+    const ctx = document.getElementById('p-chart-nps').getContext('2d');
+    pCharts['p-chart-nps'] = new Chart(ctx,{
+      type:'bar',
+      data:{ labels:sorted.map(x=>x[0]), datasets:[{
+        label:'Respuestas', data:sorted.map(x=>x[1]),
+        backgroundColor: sorted.map(x => parseInt(x[0])>=9?'#22D97A':parseInt(x[0])>=7?'#FFB830':'#FF4D6A'),
+        borderWidth:0, borderRadius:6
+      }]},
+      options:{ responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
+    });
+  }
+
+  // Satisfacción chart
+  if(kSat){
+    destroyPChart('p-chart-satisfaccion');
+    const freq = {};
+    data.forEach(r => { const v = String(r[kSat]||'').trim(); if(v) freq[v]=(freq[v]||0)+1; });
+    const sorted = Object.entries(freq).sort((a,b)=>parseInt(a[0])-parseInt(b[0]));
+    const ctx = document.getElementById('p-chart-satisfaccion').getContext('2d');
+    pCharts['p-chart-satisfaccion'] = new Chart(ctx,{
+      type:'doughnut',
+      data:{ labels:sorted.map(x=>'⭐'.repeat(parseInt(x[0]))||x[0]),
+        datasets:[{ data:sorted.map(x=>x[1]), backgroundColor:COLORS, borderWidth:0, hoverOffset:8 }]},
+      options:{ responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ position:'right', labels:{boxWidth:12,padding:14} } } }
+    });
+  }
+
+  // Secciones radar/bar
+  destroyPChart('p-chart-secciones');
+  const secLabels = ['Usabilidad','Contenido Pedagógico','Impacto'];
+  const secVals = [
+    q1keys.length ? parseFloat(avg(data,q1keys)) : 0,
+    q2keys.length ? parseFloat(avg(data,q2keys)) : 0,
+    q3keys.length ? parseFloat(avg(data,q3keys)) : 0,
+  ];
+  const ctxSec = document.getElementById('p-chart-secciones').getContext('2d');
+  pCharts['p-chart-secciones'] = new Chart(ctxSec,{
+    type:'bar',
+    data:{ labels:secLabels, datasets:[{
+      label:'Promedio', data:secVals,
+      backgroundColor:['rgba(10,95,255,0.7)','rgba(0,198,174,0.7)','rgba(34,217,122,0.7)'],
+      borderWidth:0, borderRadius:8
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true, max:5}} }
+  });
+
+  // Función, Carrera, Frecuencia
+  if(kFuncion)    freqChart('p-chart-funciones',   data, kFuncion,    'Estudiantes');
+  if(kCarrera)    freqChart('p-chart-carreras',    data, kCarrera,    'Estudiantes');
+  if(kFrecuencia) freqChart('p-chart-frecuencia',  data, kFrecuencia, 'Estudiantes');
+
+  // Respuestas cualitativas
+  if(kPositivo){
+    document.getElementById('p-positivos').innerHTML =
+      data.filter(r=>r[kPositivo]).map(r=>`<div style="padding:6px 0;border-bottom:1px solid var(--border)">💬 ${r[kPositivo]}</div>`).join('') || '<span>Sin respuestas</span>';
+  }
+  if(kMejora){
+    document.getElementById('p-mejoras').innerHTML =
+      data.filter(r=>r[kMejora]).map(r=>`<div style="padding:6px 0;border-bottom:1px solid var(--border)">🔧 ${r[kMejora]}</div>`).join('') || '<span>Sin respuestas</span>';
+  }
+
+  switchTab('percepcion');
 }
 
 // ──────────────────────────────────────────────
