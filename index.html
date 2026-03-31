@@ -1011,7 +1011,7 @@ function switchTab(tab) {
 // ──────────────────────────────────────────────
 // GOOGLE SHEETS URL
 // ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxq14Hu5fUsvFkd-bzoD0ehjN7zJrsbVEGV8Ml1ysweV-RPHvBZSf56rRCJO_KP4FwC/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxW2B3XWrvoM2T7OkdjomAzIxUgY0aqPELKVoqG6_E2gygGgH6R2XoSQQt93bdYeN7V/exec';
 
 // ──────────────────────────────────────────────
 // SURVEY SUBMIT
@@ -1371,11 +1371,8 @@ async function cargarPercepcion(){
   status.innerHTML = '⏳ Cargando datos...';
   status.style.color = 'var(--warning)';
   try {
-    const res = await fetch(SCRIPT_URL, { method:'GET', mode:'no-cors' });
-    // no-cors no devuelve body, usar iframe trick o jsonp
-    // Usamos una alternativa: fetch con ?callback para JSONP
     const url = SCRIPT_URL + '?t=' + Date.now();
-    const resp = await fetch(url);
+    const resp = await fetch(url, { method:'GET' });
     const data = await resp.json();
     if(!Array.isArray(data) || data.length === 0){
       status.innerHTML = '⚠️ Sin respuestas aún';
