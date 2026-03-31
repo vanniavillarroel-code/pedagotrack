@@ -1366,20 +1366,29 @@ function renderDashboard(){
 let pCharts = {};
 function destroyPChart(id){ if(pCharts[id]){ pCharts[id].destroy(); delete pCharts[id]; } }
 
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS62senvlhdLh8NyBydcvBGXsuxVsUprWLRUQ7IVJx47oZf6vqNX8_EnDnu4UMwcHAFsipYepaabxuD/pub?gid=0&single=true&output=csv';
+
 async function cargarPercepcion(){
   const status = document.getElementById('p-sync-status');
   status.innerHTML = '⏳ Cargando datos...';
   status.style.color = 'var(--warning)';
   try {
-    const url = SCRIPT_URL + '?t=' + Date.now();
-    const resp = await fetch(url, { method:'GET', redirect:'follow' });
-    const data = await resp.json();
-    if(!Array.isArray(data) || data.length === 0){
+    const resp = await fetch(CSV_URL + '&t=' + Date.now());
+    const text = await resp.text();
+    const rows = text.trim().split('\n');
+    if(rows.length < 2){
       status.innerHTML = '⚠️ Sin respuestas aún';
       status.style.color = 'var(--warning)';
       showToast('No hay respuestas registradas todavía','err');
       return;
     }
+    const headers = rows[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
+    const data = rows.slice(1).map(row => {
+      const vals = row.match(/(".*?"|[^,]+|(?<=,)(?=,)|^(?=,)|(?<=,)$)/g) || [];
+      const obj = {};
+      headers.forEach((h,i) => { obj[h] = (vals[i]||'').replace(/^"|"$/g,'').trim(); });
+      return obj;
+    });
     status.innerHTML = '🟢 ' + data.length + ' respuestas cargadas';
     status.style.color = 'var(--success)';
     renderPercepcion(data);
