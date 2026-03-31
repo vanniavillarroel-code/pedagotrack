@@ -384,7 +384,7 @@
     <button class="tab-btn" onclick="switchTab('dashboard')" id="tab-dashboard">
       <span class="tab-icon">📊</span> Dashboard de Reportes
     </button>
-    <button class="tab-btn" onclick="switchTab('percepcion')" id="tab-percepcion">
+    <button class="tab-btn" onclick="switchTab('percepcion');cargarPercepcion();" id="tab-percepcion">
       <span class="tab-icon">🎯</span> Dashboard de Percepción
     </button>
   </div>
@@ -1372,7 +1372,7 @@ async function cargarPercepcion(){
   status.style.color = 'var(--warning)';
   try {
     const url = SCRIPT_URL + '?t=' + Date.now();
-    const resp = await fetch(url, { method:'GET' });
+    const resp = await fetch(url, { method:'GET', redirect:'follow' });
     const data = await resp.json();
     if(!Array.isArray(data) || data.length === 0){
       status.innerHTML = '⚠️ Sin respuestas aún';
@@ -1391,12 +1391,7 @@ async function cargarPercepcion(){
   }
 }
 
-// Auto-cargar al abrir la pestaña
-const _origSwitchTab = switchTab;
-function switchTab(tab){
-  _origSwitchTab(tab);
-  if(tab === 'percepcion') cargarPercepcion();
-}
+// Auto-carga manejada desde el botón de la pestaña
 
 function avg(data, keys){
   const vals = [];
@@ -1526,7 +1521,6 @@ function renderPercepcion(data){
       data.filter(r=>r[kMejora]).map(r=>`<div style="padding:6px 0;border-bottom:1px solid var(--border)">🔧 ${r[kMejora]}</div>`).join('') || '<span>Sin respuestas</span>';
   }
 
-  switchTab('percepcion');
 }
 
 // ──────────────────────────────────────────────
