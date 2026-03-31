@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Coach Pedagógico · UNIFRANZ Cochabamba · Panel de Percepción</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --primary:      #0A5FFF;
+    --primary-dark: #003EC2;
+    --accent:       #00C6AE;
+    --accent2:      #FF6B35;
+    --bg:           #05081A;
+    --surface:      #0D1230;
+    --surface2:     #121840;
+    --border:       rgba(255,255,255,0.07);
+    --text:         #E8EEFF;
+    --muted:        #7B89B8;
+    --success:      #22D97A;
+    --warning:      #FFB830;
+    --danger:       #FF4D6A;
+    --radius:       16px;
+    --shadow:       0 8px 40px rgba(0,0,0,0.45);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND MESH ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 80% 10%, rgba(0,198,174,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 10% 80%, rgba(10,95,255,0.1) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 60% at 50% 50%, rgba(255,107,53,0.04) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── LAYOUT ── */
+  .app-wrapper { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── HEADER ── */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 0 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 36px;
+  }
+  .logo-block { display: flex; align-items: center; gap: 14px; }
+  .logo-icon {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800; color: #fff;
+    box-shadow: 0 0 24px rgba(10,95,255,0.5);
+  }
+  .logo-text h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
+  .logo-text span { font-size: 0.78rem; color: var(--muted); font-weight: 400; }
+  .badge-version {
+    background: rgba(0,198,174,0.12); color: var(--accent);
+    border: 1px solid rgba(0,198,174,0.25);
+    padding: 4px 12px; border-radius: 999px; font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex; gap: 6px;
+    background: var(--surface); border-radius: 14px; padding: 6px;
+    margin-bottom: 36px; border: 1px solid var(--border);
+    width: fit-content;
+  }
+  .tab-btn {
+    padding: 10px 24px; border-radius: 10px; border: none; cursor: pointer;
+    font-family: 'Outfit', sans-serif; font-size: 0.88rem; font-weight: 600;
+    color: var(--muted); background: transparent;
+    transition: all 0.25s ease; white-space: nowrap;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--primary) 0%, #1A7CFF 100%);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(10,95,255,0.4);
+  }
+  .tab-btn:hover:not(.active) { color: var(--text); background: var(--surface2); }
+  .tab-icon { font-size: 1rem; }
+
+  /* ── PANELS ── */
+  .panel { display: none; animation: fadeUp 0.4s ease both; }
+  .panel.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 1rem; font-weight: 700; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card-title .icon { font-size: 1.2rem; }
+  .card-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 24px; }
+
+  /* ── FORM ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media(max-width:640px){ .form-grid { grid-template-columns: 1fr; } }
+
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 0.82rem; font-weight: 600; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+  
+  input[type=text], input[type=email], select, textarea {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+    color: var(--text); font-family: 'Outfit', sans-serif; font-size: 0.92rem;
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--primary); box-shadow: 0 0 0 3px rgba(10,95,255,0.18);
+  }
+  select option { background: var(--surface2); }
+  textarea { resize: vertical; min-height: 90px; }
+
+  /* ── SCALE LIKERT ── */
+  .scale-section { margin-bottom: 32px; }
+  .scale-section h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .scale-section h3 .num { background: var(--primary); color: #fff; width: 24px; height: 24px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+
+  .scale-item { margin-bottom: 20px; }
+  .scale-item .q-text { font-size: 0.88rem; color: var(--text); margin-bottom: 12px; font-weight: 500; }
+  .scale-options { display: flex; gap: 8px; flex-wrap: wrap; }
+  .scale-options label {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; text-transform: none; letter-spacing: 0;
+    font-size: 0.75rem; color: var(--muted); font-weight: 500;
+  }
+  .scale-options input[type=radio] { display: none; }
+  .scale-options .dot {
+    width: 38px; height: 38px; border-radius: 10px;
+    border: 2px solid var(--border); background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 700; color: var(--muted);
+    transition: all 0.2s; cursor: pointer;
+  }
+  .scale-options input[type=radio]:checked + .dot {
+    background: var(--primary); border-color: var(--primary);
+    color: #fff; box-shadow: 0 0 16px rgba(10,95,255,0.4);
+    transform: scale(1.08);
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px 28px; border-radius: 12px; border: none;
+    font-family: 'Outfit', sans-serif; font-size: 0.92rem; font-weight: 700;
+    cursor: pointer; transition: all 0.25s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), #1A7CFF);
+    color: #fff; box-shadow: 0 4px 20px rgba(10,95,255,0.35);
+  }
+  .btn-primary:hover { box-shadow: 0 6px 28px rgba(10,95,255,0.55); transform: translateY(-2px); }
+  .btn-accent {
+    background: linear-gradient(135deg, var(--accent), #00E8CB);
+    color: #05081A; box-shadow: 0 4px 20px rgba(0,198,174,0.3);
+  }
+  .btn-accent:hover { box-shadow: 0 6px 28px rgba(0,198,174,0.5); transform: translateY(-2px); }
+  .btn-outline {
+    background: transparent; border: 1.5px solid var(--border);
+    color: var(--text);
+  }
+  .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+
+  /* ── UPLOAD ZONE ── */
+  .upload-zone {
+    border: 2px dashed rgba(10,95,255,0.35); border-radius: var(--radius);
+    padding: 48px 24px; text-align: center; cursor: pointer;
+    transition: all 0.3s; background: rgba(10,95,255,0.04);
+    position: relative;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--primary); background: rgba(10,95,255,0.1);
+  }
+  .upload-zone .upload-icon { font-size: 3rem; margin-bottom: 14px; display: block; }
+  .upload-zone h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+  .upload-zone p { font-size: 0.82rem; color: var(--muted); }
+  #fileInput { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+  /* ── STATS GRID ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 22px;
+    position: relative; overflow: hidden;
+  }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .stat-card.c1::before { background: linear-gradient(90deg, var(--primary), var(--accent)); }
+  .stat-card.c2::before { background: linear-gradient(90deg, var(--accent), var(--success)); }
+  .stat-card.c3::before { background: linear-gradient(90deg, var(--accent2), var(--warning)); }
+  .stat-card.c4::before { background: linear-gradient(90deg, var(--success), var(--accent)); }
+  .stat-card.c5::before { background: linear-gradient(90deg, var(--warning), var(--accent2)); }
+  .stat-card.c6::before { background: linear-gradient(90deg, var(--danger), var(--accent2)); }
+  .stat-label { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .stat-value { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; font-family: 'JetBrains Mono', monospace; }
+  .stat-value.blue { color: var(--primary); }
+  .stat-value.teal { color: var(--accent); }
+  .stat-value.orange { color: var(--accent2); }
+  .stat-value.green { color: var(--success); }
+  .stat-value.yellow { color: var(--warning); }
+  .stat-value.red { color: var(--danger); }
+  .stat-change { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+  /* ── CHART GRID ── */
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  @media(max-width:900px){ .chart-grid { grid-template-columns: 1fr; } }
+  .chart-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px;
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+  .chart-title { font-size: 0.9rem; font-weight: 700; }
+  .chart-sub { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .chart-wrap { position: relative; height: 280px; }
+  .chart-wrap.tall { height: 340px; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  thead th {
+    background: var(--surface2); padding: 12px 16px; text-align: left;
+    font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td { padding: 12px 16px; color: var(--text); vertical-align: middle; }
+  .tag {
+    display: inline-flex; align-items: center;
+    padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 600;
+  }
+  .tag.green { background: rgba(34,217,122,0.15); color: var(--success); }
+  .tag.yellow { background: rgba(255,184,48,0.15); color: var(--warning); }
+  .tag.red { background: rgba(255,77,106,0.15); color: var(--danger); }
+  .tag.blue { background: rgba(10,95,255,0.15); color: #6FA3FF; }
+
+  /* ── ALERT / NOTICE ── */
+  .alert {
+    border-radius: 12px; padding: 16px 20px; font-size: 0.85rem;
+    display: flex; gap: 12px; align-items: flex-start; margin-bottom: 20px;
+  }
+  .alert.info { background: rgba(10,95,255,0.1); border: 1px solid rgba(10,95,255,0.25); color: #A8C4FF; }
+  .alert.success { background: rgba(34,217,122,0.1); border: 1px solid rgba(34,217,122,0.3); color: #A7F3D0; }
+  .alert.warning { background: rgba(255,184,48,0.1); border: 1px solid rgba(255,184,48,0.3); color: #FDE68A; }
+  .alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── STEP GUIDE ── */
+  .steps { counter-reset: step; display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex; gap: 20px; padding: 22px 0;
+    border-bottom: 1px solid var(--border); position: relative;
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    counter-increment: step;
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 800; color: #fff;
+    box-shadow: 0 4px 14px rgba(10,95,255,0.35);
+  }
+  .step-body h4 { font-size: 0.92rem; font-weight: 700; margin-bottom: 6px; }
+  .step-body p { font-size: 0.83rem; color: var(--muted); line-height: 1.6; }
+  .code-block {
+    background: #070B1C; border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 18px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem; color: var(--accent); margin-top: 10px;
+    overflow-x: auto; white-space: pre; line-height: 1.7;
+  }
+  .code-comment { color: var(--muted); }
+  .code-key { color: #FF79C6; }
+  .code-str { color: var(--warning); }
+  .code-fn { color: #50FA7B; }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── PROGRESS ── */
+  .progress-bar { background: var(--surface2); border-radius: 999px; height: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 999px; transition: width 0.8s ease; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 32px; right: 32px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 22px;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 0.88rem; font-weight: 500;
+    box-shadow: 0 16px 50px rgba(0,0,0,0.5);
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+    z-index: 999; max-width: 360px;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.ok { border-color: rgba(34,217,122,0.4); }
+  #toast.err { border-color: rgba(255,77,106,0.4); }
+  #toast-icon { font-size: 1.2rem; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-state .empty-icon { font-size: 3.5rem; margin-bottom: 16px; opacity: 0.5; }
+  .empty-state h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .empty-state p { font-size: 0.83rem; }
+
+  /* ── LOADING SPINNER ── */
+  .spinner {
+    display: inline-block; width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff;
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:600px) {
+    header { flex-direction: column; gap: 14px; align-items: flex-start; }
+    .tabs { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-block">
+      <div class="logo-icon">CP</div>
+      <div class="logo-text">
+        <h1>Coach Pedagógico</h1>
+        <span>PedagoTrack · Panel de Seguimiento & Datos</span>
+      </div>
+    </div>
+    <span class="badge-version">UNIFRANZ · 2025</span>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('survey')" id="tab-survey">
+      <span class="tab-icon">📋</span> Registro de Percepción
+    </button>
+    <button class="tab-btn" onclick="switchTab('dashboard')" id="tab-dashboard">
+      <span class="tab-icon">📊</span> Dashboard de Análisis
+    </button>
+
+  </div>
+
+  <!-- ═══════════════════════════ TAB 1: SURVEY ═══════════════════════════ -->
+  <div class="panel active" id="panel-survey">
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📝</span> Formulario de Percepción · Coach Pedagógico</div>
+      <div class="card-sub">Registra la percepción del estudiante sobre el <strong>Coach Pedagógico</strong> (Magma Somos). El docente/coach completa este formulario tras la interacción con el estudiante.</div>
+
+      <!-- SECCIÓN 0: QUIEN LEVANTA EL TICKET + DATOS DEL ESTUDIANTE -->
+
+      <!-- Docente/Coach: solo nombre -->
+      <div class="scale-section">
+        <h3><span class="num">A</span> Quien Levanta el Ticket</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre del docente / coach</label>
+            <input type="text" id="f_nombre" placeholder="Ej: Susana López" />
+          </div>
+          <div class="form-group">
+            <label>Tipo de contacto con el estudiante</label>
+            <select id="f_tipo_contacto">
+              <option value="">Selecciona</option>
+              <option>Iniciado por el estudiante</option>
+              <option>Iniciado por el coach / docente</option>
+              <option>Cita programada</option>
+              <option>Virtual / Mensaje</option>
+              <option>Seguimiento de sesión anterior</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estudiante: datos principales -->
+      <div class="scale-section">
+        <h3><span class="num">B</span> Datos del Estudiante</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre completo del estudiante</label>
+            <input type="text" id="f_est_nombre" placeholder="Ej: Roberto Oblitas Zamora" />
+          </div>
+          <div class="form-group">
+            <label>Correo UNIFRANZ</label>
+            <input type="email" id="f_email" placeholder="roberto.oblitas@unifranz.edu.bo" />
+          </div>
+          <div class="form-group">
+            <label>Carrera</label>
+            <select id="f_nivel">
+              <option value="">Selecciona una carrera</option>
+              <option>Administración de Empresas</option>
+              <option>Ingeniería de Sistemas</option>
+              <option>Derecho</option>
+              <option>Comunicación y Marketing</option>
+              <option>Arquitectura y Diseño</option>
+              <option>Ciencias de la Salud</option>
+              <option>Psicología</option>
+              <option>Otra carrera</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Semestre / Nivel</label>
+            <select id="f_experiencia">
+              <option value="">Selecciona</option>
+              <option>1er semestre</option>
+              <option>2do semestre</option>
+              <option>3er semestre</option>
+              <option>4to semestre</option>
+              <option>5to semestre</option>
+              <option>6to semestre</option>
+              <option>7mo semestre +</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Frecuencia de uso del Coach Pedagógico</label>
+            <select id="f_frecuencia">
+              <option value="">Selecciona</option>
+              <option>Diario</option>
+              <option>Varias veces por semana</option>
+              <option>Una vez por semana</option>
+              <option>Ocasionalmente</option>
+              <option>Primera vez hoy</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Función más usada por el estudiante</label>
+            <select id="f_funcion_usada">
+              <option value="">Selecciona</option>
+              <option>Repasar Contenido</option>
+              <option>Microevaluaciones</option>
+              <option>Diálogo Inteligente</option>
+              <option>Varias por igual</option>
+              <option>Aún no ha explorado la app</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 1: USABILIDAD -->
+      <div class="scale-section">
+        <h3><span class="num">1</span> Usabilidad & Facilidad de Uso · (Percepción del Estudiante)</h3>
+
+        <div class="scale-item">
+          <div class="q-text">1.1 · La navegación entre secciones de la app (Inicio, Coach, Calendario, Perfil) es clara e intuitiva.</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q1_1" value="1"><span class="dot">1</span>Muy en<br>desacuerdo</label>
+            <label><input type="radio" name="q1_1" value="2"><span class="dot">2</span></label>
+            <label><input type="radio" name="q1_1" value="3"><span class="dot">3</span>Neutral</label>
+            <label><input type="radio" name="q1_1" value="4"><span class="dot">4</span></label>
+            <label><input type="radio" name="q1_1" value="5"><span class="dot">5</span>Muy de<br>acuerdo</label>
+          </div>
+        </div>
+
+        <div class="scale-item">
+          <div class="q-text">1.2 · Accedí a las funciones del Coach (Repasar contenido / Microevaluaciones) sin necesitar ayuda externa.</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q1_2" value="1"><span class="dot">1</span>Muy en<br>desacuerdo</label>
+            <label><input type="radio" name="q1_2" value="2"><span class="dot">2</span></label>
+            <label><input type="radio" name="q1_2" value="3"><span class="dot">3</span>Neutral</label>
+            <label><input type="radio" name="q1_2" value="4"><span class="dot">4</span></label>
+            <label><input type="radio" name="q1_2" value="5"><span class="dot">5</span>Muy de<br>acuerdo</label>
+          </div>
+        </div>
+
+        <div class="scale-item">
+          <div class="q-text">1.3 · Los tiempos de carga y respuesta de la IA dentro del Coach son aceptables.</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q1_3" value="1"><span class="dot">1</span>Muy en<br>desacuerdo</label>
+            <label><input type="radio" name="q1_3" value="2"><span class="dot">2</span></label>
+            <label><input type="radio" name="q1_3" value="3"><span class="dot">3</span>Neutral</label>
+            <label><input type="radio" name="q1_3" value="4"><span class="dot">4</span></label>
+            <label><input type="radio" name="q1_3" value="5"><span class="dot">5</span>Muy de<br>acuerdo</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 2: CONTENIDO PEDAGÓGICO -->
+      <div class="scale-section">
+        <h3><span class="num">2</span> Contenido & Valor Pedagógico · (Percepción del Estudiante)</h3>
+
+        <div class="scale-item">
+          <div class="q-text">2.1 · El contenido de las sesiones disponibles en "Repasar Contenido" es relevante y actualizado.</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q2_1" value="1"><span class="dot">1</span>Muy en<br>desacuerdo</label>
+            <label><input type="radio" name="q2_1" value="2"><span class="dot">2</span></label>
+            <label><input type="radio" name="q2_1" value="3"><span class="dot">3</span>Neutral</label>
+            <label><input type="radio" name="q2_1" value="4"><span class="dot">4</span></label>
+            <label><input type="radio" name="q2_1" value="5"><span class="dot">5</span>Muy de<br>acuerdo</label>
+          </div>
+        </div>
+
+        <div class="scale-item">
+          <div class="q-text">2.2 · La función de "Diálogo Inteligente" responde con precisión a preguntas sobre los temas de las materias.</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q2_2" value="1"><span class="dot">1</span>Muy en<br>desacuerdo</label>
+            <label><input type="radio" name="q2_2" value="2"><span class="dot">2</span></label>
+            <label><input type="radio" name="q2_2" value="3"><span class="dot">3</span>Neutral</label>
+            <label><input type="radio" name="q2_2" value="4"><span class="dot">4</span></label>
+            <label><input type="radio" name="q2_2" value="5"><span class="dot">5</span>Muy de<br>acuerdo</label>
+          </div>
+        </div>
+
+        <div class="scale-item">
+          <div class="q-text">2.3 · Las Microevaluaciones generadas por la IA son pertinentes a los temas vistos en clase.</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q2_3" value="1"><span class="dot">1</span>Muy en<br>desacuerdo</label>
+            <label><input type="radio" name="q2_3" value="2"><span class="dot">2</span></label>
+            <label><input type="radio" name="q2_3" value="3"><span class="dot">3</span>Neutral</label>
+            <label><input type="radio" name="q2_3" value="4"><span class="dot">4</span></label>
+            <label><input type="radio" name="q2_3" value="5"><span class="dot">5</span>Muy de<br>acuerdo</label>
+          </div>
+        </div>
+
+        <div class="scale-item">
+          <div class="q-text">2.4 · La app personaliza el contenido adecuadamente según la materia y el semestre del estudiante.</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q2_4" value="1"><span class="dot">1</span>Muy en<br>desacuerdo</label>
+            <label><input type="radio" name="q2_4" value="2"><span class="dot">2</span></label>
+            <label><input type="radio" name="q2_4" value="3"><span class="dot">3</span>Neutral</label>
+            <label><input type="radio" name="q2_4" value="4"><span class="dot">4</span></label>
+            <label><input type="radio" name="q2_4" value="5"><span class="dot">5</span>Muy de<br>acuerdo</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 3: IMPACTO -->
+      <div class="scale-section">
+        <h3><span class="num">3</span> Impacto en el Aprendizaje del Estudiante</h3>
+
+        <div class="scale-item">
+          <div class="q-text">3.1 · He observado que los estudiantes usan la función de Repasar Contenido antes de evaluaciones.</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q3_1" value="1"><span class="dot">1</span>Nunca</label>
+            <label><input type="radio" name="q3_1" value="2"><span class="dot">2</span>Raramente</label>
+            <label><input type="radio" name="q3_1" value="3"><span class="dot">3</span>A veces</label>
+            <label><input type="radio" name="q3_1" value="4"><span class="dot">4</span>Frecuentemente</label>
+            <label><input type="radio" name="q3_1" value="5"><span class="dot">5</span>Siempre</label>
+          </div>
+        </div>
+
+        <div class="scale-item">
+          <div class="q-text">3.2 · He notado mejoras en el rendimiento académico de estudiantes que usan regularmente el Coach Pedagógico.</div>
+          <div class="scale-options">
+            <label><input type="radio" name="q3_2" value="1"><span class="dot">1</span>Ninguna<br>mejora</label>
+            <label><input type="radio" name="q3_2" value="2"><span class="dot">2</span></label>
+            <label><input type="radio" name="q3_2" value="3"><span class="dot">3</span>Algo de<br>mejora</label>
+            <label><input type="radio" name="q3_2" value="4"><span class="dot">4</span></label>
+            <label><input type="radio" name="q3_2" value="5"><span class="dot">5</span>Mejora<br>notable</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 4: NPS + CUALITATIVO -->
+      <div class="scale-section">
+        <h3><span class="num">4</span> Recomendación & Opinión General</h3>
+
+        <div class="scale-item">
+          <div class="q-text">4.1 · ¿Qué probabilidad hay de que recomiendes el Coach Pedagógico a colegas docentes de UNIFRANZ CBB? (0 = nada probable, 10 = totalmente probable)</div>
+          <div class="scale-options" id="nps-options">
+            <!-- Generated by JS -->
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:20px">
+          <label>4.2 · ¿Qué es lo que más valoras de la app?</label>
+          <textarea id="f_positivo" placeholder="Ej: Las microevaluaciones automáticas, el diálogo contextualizado, el seguimiento de progreso..."></textarea>
+        </div>
+
+        <div class="form-group" style="margin-top:16px">
+          <label>4.3 · ¿Qué mejorarías o agregarías a la app?</label>
+          <textarea id="f_mejora" placeholder="Ej: Más materias disponibles, integración con el sistema UNIFRANZ, reportes exportables..."></textarea>
+        </div>
+
+        <div class="form-group" style="margin-top:16px">
+          <label>4.4 · Satisfacción global</label>
+          <select id="f_satisfaccion">
+            <option value="">Selecciona</option>
+            <option value="5">⭐⭐⭐⭐⭐ · Excelente (5)</option>
+            <option value="4">⭐⭐⭐⭐ · Bueno (4)</option>
+            <option value="3">⭐⭐⭐ · Regular (3)</option>
+            <option value="2">⭐⭐ · Deficiente (2)</option>
+            <option value="1">⭐ · Muy deficiente (1)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- SUBMIT -->
+      <hr class="divider"/>
+      <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="submitSurvey()" id="submitBtn">
+          <span id="submitLabel">Enviar Respuesta</span>
+          <span>📤</span>
+        </button>
+        <button class="btn btn-outline" onclick="clearForm()">Limpiar formulario</button>
+        <span style="font-size:0.8rem;color:var(--muted)">* Tus respuestas se guardan en Google Sheets</span>
+      </div>
+
+      <div id="survey-success" style="display:none;margin-top:20px">
+        <div class="alert success">
+          <span class="alert-icon">✅</span>
+          <div><strong>¡Respuesta enviada correctamente!</strong> Gracias por tu participación. Tus datos han sido registrados.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ TAB 2: DASHBOARD ═══════════════════════════ -->
+  <div class="panel" id="panel-dashboard">
+
+    <!-- UPLOAD SECTION -->
+    <div class="card" style="margin-bottom:24px" id="upload-card">
+      <div class="card-title"><span class="icon">📂</span> Subir Reporte de la App</div>
+      <div class="card-sub">Sube el reporte exportado desde el Coach Pedagógico (Magma Somos). El sistema detectará columnas como materia, sesión, progreso y microevaluaciones automáticamente.</div>
+
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" onchange="handleFile(this)"/>
+        <span class="upload-icon">📊</span>
+        <h3>Arrastra tu archivo aquí o haz clic para seleccionar</h3>
+        <p>Formatos soportados: .xlsx · .xls · .csv · Tamaño máx: 20 MB</p>
+      </div>
+
+      <div id="file-info" style="display:none;margin-top:16px">
+        <div class="alert success">
+          <span class="alert-icon">📄</span>
+          <div><strong id="file-name-label"></strong> — <span id="file-rows-label"></span> registros cargados</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;" id="col-selector-wrap" style="display:none">
+        <div class="form-group" style="min-width:220px">
+          <label>Columna de Estudiante / Usuario</label>
+          <select id="col-docente"></select>
+        </div>
+        <div class="form-group" style="min-width:220px">
+          <label>Columna de Fecha</label>
+          <select id="col-fecha"></select>
+        </div>
+        <div class="form-group" style="min-width:220px">
+          <label>Columna de Actividad/Módulo</label>
+          <select id="col-actividad"></select>
+        </div>
+        <div class="form-group" style="min-width:220px">
+          <label>Columna de Progreso/Puntaje</label>
+          <select id="col-progreso"></select>
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button class="btn btn-accent" onclick="renderDashboard()">Generar Dashboard 🚀</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD CONTENT -->
+    <div id="dashboard-empty">
+      <div class="empty-state">
+        <div class="empty-icon">📊</div>
+        <h3>Sin datos cargados</h3>
+        <p>Sube el reporte exportado del Coach Pedagógico (UNIFRANZ) para visualizar el análisis de uso: sesiones, microevaluaciones, progreso y más.</p>
+      </div>
+    </div>
+
+    <div id="dashboard-content" style="display:none">
+
+      <!-- KPI CARDS -->
+      <div class="section-label">Indicadores clave de uso</div>
+      <div class="stats-grid" id="kpi-grid">
+        <div class="stat-card c1">
+          <div class="stat-label">Total Registros</div>
+          <div class="stat-value blue" id="kpi-total">—</div>
+          <div class="stat-change">Filas en el archivo cargado</div>
+        </div>
+        <div class="stat-card c2">
+          <div class="stat-label">Docentes Únicos</div>
+          <div class="stat-value teal" id="kpi-usuarios">—</div>
+          <div class="stat-change">Estudiantes identificados</div>
+        </div>
+        <div class="stat-card c3">
+          <div class="stat-label">Actividades / Módulos</div>
+          <div class="stat-value orange" id="kpi-actividades">—</div>
+          <div class="stat-change">Materias / tipos de actividad</div>
+        </div>
+        <div class="stat-card c4">
+          <div class="stat-label">Promedio Puntaje</div>
+          <div class="stat-value green" id="kpi-promedio">—</div>
+          <div class="stat-change">Sobre el total de registros</div>
+        </div>
+        <div class="stat-card c5">
+          <div class="stat-label">Columnas Totales</div>
+          <div class="stat-value yellow" id="kpi-columnas">—</div>
+          <div class="stat-change">Campos en el archivo</div>
+        </div>
+        <div class="stat-card c6">
+          <div class="stat-label">Rango de Fechas</div>
+          <div class="stat-value" style="font-size:1rem;color:var(--danger)" id="kpi-fechas">—</div>
+          <div class="stat-change">Período de los datos</div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW 1 -->
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Distribución por Materia / Tipo de Actividad</div>
+              <div class="chart-sub">Microevaluaciones, Repasar Contenido, Diálogo</div>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart-actividades"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Distribución de Puntajes</div>
+              <div class="chart-sub">Histograma de valores numéricos</div>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart-puntajes"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW 2 -->
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Top 10 Estudiantes por Actividad</div>
+              <div class="chart-sub">Estudiantes con mayor uso de la app</div>
+            </div>
+          </div>
+          <div class="chart-wrap tall">
+            <canvas id="chart-docentes"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Actividad en el Tiempo</div>
+              <div class="chart-sub">Registros agrupados por fecha</div>
+            </div>
+          </div>
+          <div class="chart-wrap tall">
+            <canvas id="chart-tiempo"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXTRA CHARTS -->
+      <div class="chart-grid">
+        <div class="chart-card full">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Análisis de Todas las Columnas Numéricas</div>
+              <div class="chart-sub">Promedio por columna cuantitativa detectada</div>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart-numericos"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA TABLE -->
+      <div class="section-label" style="margin-top:8px">Vista de datos · Primeras 50 filas</div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🗃️</span> Tabla de Datos Cargados</div>
+        <div class="card-sub">Previsualización del archivo importado</div>
+        <div class="table-wrap" id="data-table-container"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app-wrapper -->
+
+<!-- TOAST -->
+<div id="toast"><span id="toast-icon">✅</span><span id="toast-msg"></span></div>
+
+<script>
+// ──────────────────────────────────────────────
+// CHART.JS GLOBAL DEFAULTS
+// ──────────────────────────────────────────────
+Chart.defaults.color = '#7B89B8';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+Chart.defaults.font.family = "'Outfit', sans-serif";
+
+const COLORS = [
+  '#0A5FFF','#00C6AE','#FF6B35','#22D97A','#FFB830','#FF4D6A',
+  '#A78BFA','#38BDF8','#FB923C','#4ADE80','#F472B6','#34D399'
+];
+
+// ──────────────────────────────────────────────
+// TABS
+// ──────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ──────────────────────────────────────────────
+// BUILD NPS OPTIONS
+// ──────────────────────────────────────────────
+(function buildNPS(){
+  const wrap = document.getElementById('nps-options');
+  const labels = {0:'Nada\nprobable', 5:'Neutral', 10:'Muy\nprobable'};
+  for(let i=0;i<=10;i++){
+    const lbl = document.createElement('label');
+    lbl.innerHTML = `<input type="radio" name="nps" value="${i}"><span class="dot">${i}</span>${(labels[i]||'').replace('\n','<br>')}`;
+    wrap.appendChild(lbl);
+  }
+})();
+
+// ──────────────────────────────────────────────
+// GOOGLE SHEETS URL — pega aquí tu URL de Apps Script
+// ──────────────────────────────────────────────
+const SCRIPT_URL = 'PEGA_AQUI_TU_URL_DE_APPS_SCRIPT';
+// Ejemplo: 'https://script.google.com/macros/s/AKfyc.../exec'
+
+// ──────────────────────────────────────────────
+// SURVEY SUBMIT
+// ──────────────────────────────────────────────
+function getRadio(name){
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : '';
+}
+
+function clearForm(){
+  const inputs = document.querySelectorAll('#panel-survey input, #panel-survey select, #panel-survey textarea');
+  inputs.forEach(i => { if(i.type==='radio') i.checked=false; else i.value=''; });
+  document.getElementById('survey-success').style.display='none';
+  ['f_est_nombre','f_tipo_contacto','f_funcion_usada'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+}
+
+async function submitSurvey(){
+  const btn = document.getElementById('submitBtn');
+  const label = document.getElementById('submitLabel');
+
+  // Validaciones mínimas
+  const nombre = document.getElementById('f_nombre').value.trim();
+  const estNombre = document.getElementById('f_est_nombre').value.trim();
+  const email = document.getElementById('f_email').value.trim();
+  if(!nombre){ showToast('Indica el nombre del docente/coach que levanta el ticket','err'); return; }
+  if(!estNombre || !email){ showToast('Por favor completa Nombre y Correo del estudiante','err'); return; }
+
+  const payload = {
+    timestamp: new Date().toLocaleString('es-ES'),
+    docente_coach: nombre,
+    tipo_contacto: document.getElementById('f_tipo_contacto').value,
+    est_nombre: document.getElementById('f_est_nombre').value.trim(),
+    est_email: email,
+    est_carrera: document.getElementById('f_nivel').value,
+    est_semestre: document.getElementById('f_experiencia').value,
+    frecuencia_app: document.getElementById('f_frecuencia').value,
+    funcion_usada: document.getElementById('f_funcion_usada').value,
+    q1_1_interfaz: getRadio('q1_1'),
+    q1_2_autonavegacion: getRadio('q1_2'),
+    q1_3_velocidad: getRadio('q1_3'),
+    q2_1_relevancia: getRadio('q2_1'),
+    q2_2_estrategias: getRadio('q2_2'),
+    q2_3_retroalimentacion: getRadio('q2_3'),
+    q2_4_personalizacion: getRadio('q2_4'),
+    q3_1_implementacion: getRadio('q3_1'),
+    q3_2_mejora_estudiantes: getRadio('q3_2'),
+    nps: getRadio('nps'),
+    positivo: document.getElementById('f_positivo').value.trim(),
+    mejora: document.getElementById('f_mejora').value.trim(),
+    satisfaccion: document.getElementById('f_satisfaccion').value,
+  };
+
+  label.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  if(SCRIPT_URL){
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      showToast('Respuesta enviada a Google Sheets ✅','ok');
+    } catch(e){
+      showToast('Error de conexión. Datos guardados localmente.','err');
+    }
+  } else {
+    console.table(payload);
+    showToast('URL no configurada. Datos en consola (F12)','err');
+  }
+
+  document.getElementById('survey-success').style.display = 'block';
+  label.textContent = 'Enviar Respuesta';
+  btn.disabled = false;
+}
+
+// ──────────────────────────────────────────────
+// DRAG & DROP
+// ──────────────────────────────────────────────
+const zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if(file) processFile(file);
+});
+
+function handleFile(input){
+  if(input.files[0]) processFile(input.files[0]);
+}
+
+// ──────────────────────────────────────────────
+// FILE PROCESSING
+// ──────────────────────────────────────────────
+let globalData = [], globalHeaders = [];
+
+function processFile(file){
+  const reader = new FileReader();
+  reader.onload = function(e){
+    let wb;
+    if(file.name.endsWith('.csv')){
+      const csv = e.target.result;
+      wb = XLSX.read(csv, {type:'string'});
+    } else {
+      const data = new Uint8Array(e.target.result);
+      wb = XLSX.read(data, {type:'array'});
+    }
+
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet, {defval:''});
+    globalData = json;
+    globalHeaders = json.length > 0 ? Object.keys(json[0]) : [];
+
+    // Show file info
+    document.getElementById('file-name-label').textContent = file.name;
+    document.getElementById('file-rows-label').textContent = json.length + ' registros encontrados';
+    document.getElementById('file-info').style.display = 'block';
+
+    // Populate column selectors
+    populateSelectors();
+    document.getElementById('col-selector-wrap').style.display = 'flex';
+
+    showToast(`Archivo cargado: ${json.length} filas`, 'ok');
+  };
+
+  if(file.name.endsWith('.csv')) reader.readAsText(file, 'UTF-8');
+  else reader.readAsArrayBuffer(file);
+}
+
+function populateSelectors(){
+  const selectors = ['col-docente','col-fecha','col-actividad','col-progreso'];
+  const hints = [
+    ['estudiante','usuario','nombre','alumno','student','user'],
+    ['fecha','date','tiempo','created','timestamp'],
+    ['actividad','modulo','materia','microevaluacion','sesion','tipo','repaso','coach'],
+    ['progreso','puntaje','score','nota','grade','porcentaje','resultado','aciertos','correctas']
+  ];
+
+  selectors.forEach((selId, i) => {
+    const sel = document.getElementById(selId);
+    sel.innerHTML = '<option value="">— Selecciona —</option>';
+    globalHeaders.forEach(h => {
+      const opt = document.createElement('option');
+      opt.value = h; opt.textContent = h;
+      // Auto-detect
+      const lower = h.toLowerCase();
+      if(hints[i].some(hint => lower.includes(hint))) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+// ──────────────────────────────────────────────
+// RENDER DASHBOARD
+// ──────────────────────────────────────────────
+let charts = {};
+
+function destroyChart(id){
+  if(charts[id]){ charts[id].destroy(); delete charts[id]; }
+}
+
+function renderDashboard(){
+  if(!globalData.length){ showToast('No hay datos cargados','err'); return; }
+
+  const colDoc   = document.getElementById('col-docente').value;
+  const colFecha = document.getElementById('col-fecha').value;
+  const colAct   = document.getElementById('col-actividad').value;
+  const colProg  = document.getElementById('col-progreso').value;
+
+  document.getElementById('dashboard-empty').style.display = 'none';
+  document.getElementById('dashboard-content').style.display = 'block';
+
+  // ── KPIs ──
+  const total = globalData.length;
+  const usuarios = colDoc ? new Set(globalData.map(r => r[colDoc])).size : '—';
+  const actividades = colAct ? new Set(globalData.map(r => r[colAct])).size : '—';
+
+  let promedio = '—';
+  if(colProg){
+    const vals = globalData.map(r => parseFloat(r[colProg])).filter(v => !isNaN(v));
+    promedio = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2) : '—';
+  }
+
+  let fechaRango = '—';
+  if(colFecha){
+    const fechas = globalData.map(r => r[colFecha]).filter(Boolean).sort();
+    if(fechas.length) fechaRango = fechas[0] + ' → ' + fechas[fechas.length-1];
+  }
+
+  document.getElementById('kpi-total').textContent = total.toLocaleString();
+  document.getElementById('kpi-usuarios').textContent = usuarios;
+  document.getElementById('kpi-actividades').textContent = actividades;
+  document.getElementById('kpi-promedio').textContent = promedio;
+  document.getElementById('kpi-columnas').textContent = globalHeaders.length;
+  document.getElementById('kpi-fechas').textContent = fechaRango;
+
+  // ── CHART: Actividades ──
+  destroyChart('actividades');
+  if(colAct){
+    const freq = {};
+    globalData.forEach(r => { const k = r[colAct]||'Sin categoría'; freq[k] = (freq[k]||0)+1; });
+    const sorted = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,12);
+    const ctx = document.getElementById('chart-actividades').getContext('2d');
+    charts['actividades'] = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: sorted.map(x=>x[0]),
+        datasets:[{ data: sorted.map(x=>x[1]), backgroundColor: COLORS, borderWidth:0, hoverOffset:8 }]
+      },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'right', labels:{boxWidth:12,padding:14} } } }
+    });
+  }
+
+  // ── CHART: Puntajes histograma ──
+  destroyChart('puntajes');
+  if(colProg){
+    const vals = globalData.map(r => parseFloat(r[colProg])).filter(v => !isNaN(v));
+    const buckets = {};
+    vals.forEach(v => {
+      const b = Math.floor(v/10)*10;
+      const key = `${b}-${b+9}`;
+      buckets[key] = (buckets[key]||0)+1;
+    });
+    const sorted = Object.entries(buckets).sort((a,b) => parseInt(a[0])-parseInt(b[0]));
+    const ctx = document.getElementById('chart-puntajes').getContext('2d');
+    charts['puntajes'] = new Chart(ctx, {
+      type:'bar',
+      data:{
+        labels: sorted.map(x=>x[0]),
+        datasets:[{
+          label:'Frecuencia', data: sorted.map(x=>x[1]),
+          backgroundColor:'rgba(0,198,174,0.7)', borderColor:'#00C6AE', borderWidth:1, borderRadius:6
+        }]
+      },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
+    });
+  }
+
+  // ── CHART: Top docentes ──
+  destroyChart('docentes');
+  if(colDoc){
+    const freq = {};
+    globalData.forEach(r => { const k = r[colDoc]||'Desconocido'; freq[k] = (freq[k]||0)+1; });
+    const sorted = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const ctx = document.getElementById('chart-docentes').getContext('2d');
+    charts['docentes'] = new Chart(ctx, {
+      type:'bar',
+      data:{
+        labels: sorted.map(x=>x[0]),
+        datasets:[{
+          label:'Registros', data: sorted.map(x=>x[1]),
+          backgroundColor: COLORS.slice(0,10), borderWidth:0, borderRadius:6
+        }]
+      },
+      options:{
+        indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true}}
+      }
+    });
+  }
+
+  // ── CHART: Tiempo ──
+  destroyChart('tiempo');
+  if(colFecha){
+    const freq = {};
+    globalData.forEach(r => {
+      let d = String(r[colFecha]||'').split('T')[0].split(' ')[0];
+      if(d) freq[d] = (freq[d]||0)+1;
+    });
+    const sorted = Object.entries(freq).sort((a,b)=>a[0].localeCompare(b[0]));
+    const ctx = document.getElementById('chart-tiempo').getContext('2d');
+    charts['tiempo'] = new Chart(ctx, {
+      type:'line',
+      data:{
+        labels: sorted.map(x=>x[0]),
+        datasets:[{
+          label:'Registros por día', data: sorted.map(x=>x[1]),
+          borderColor:'#0A5FFF', backgroundColor:'rgba(10,95,255,0.12)',
+          fill:true, tension:0.4, pointRadius:3, pointBackgroundColor:'#0A5FFF'
+        }]
+      },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
+    });
+  }
+
+  // ── CHART: Columnas numéricas ──
+  destroyChart('numericos');
+  const numericCols = globalHeaders.filter(h => {
+    const vals = globalData.slice(0,20).map(r => parseFloat(r[h])).filter(v => !isNaN(v));
+    return vals.length > 5;
+  });
+  if(numericCols.length){
+    const avgs = numericCols.map(col => {
+      const vals = globalData.map(r=>parseFloat(r[col])).filter(v=>!isNaN(v));
+      return vals.reduce((a,b)=>a+b,0)/vals.length;
+    });
+    const ctx = document.getElementById('chart-numericos').getContext('2d');
+    charts['numericos'] = new Chart(ctx, {
+      type:'bar',
+      data:{
+        labels: numericCols,
+        datasets:[{
+          label:'Promedio', data: avgs.map(v=>+v.toFixed(2)),
+          backgroundColor: numericCols.map((_,i)=>COLORS[i%COLORS.length]),
+          borderWidth:0, borderRadius:8
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{y:{beginAtZero:true}}
+      }
+    });
+  }
+
+  // ── TABLE ──
+  const preview = globalData.slice(0,50);
+  let html = '<table><thead><tr>';
+  globalHeaders.forEach(h => { html += `<th>${h}</th>`; });
+  html += '</tr></thead><tbody>';
+  preview.forEach(row => {
+    html += '<tr>';
+    globalHeaders.forEach(h => {
+      const v = row[h];
+      const n = parseFloat(v);
+      let display = v === '' || v === null ? '<span style="color:var(--muted)">—</span>' : v;
+      if(!isNaN(n) && v !== '') {
+        const color = n >= 80 ? 'green' : n >= 60 ? 'yellow' : n >= 40 ? 'blue' : 'red';
+        display = `<span class="tag ${color}">${v}</span>`;
+      }
+      html += `<td>${display}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('data-table-container').innerHTML = html;
+
+  showToast('Dashboard generado correctamente 🎉','ok');
+  switchTab('dashboard');
+}
+
+// ──────────────────────────────────────────────
+// TOAST
+// ──────────────────────────────────────────────
+function showToast(msg, type='ok'){
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = type==='ok' ? '✅' : '⚠️';
+  t.className = 'show ' + type;
+  setTimeout(()=>{ t.classList.remove('show'); },3500);
+}
+</script>
+</body>
+</html>
