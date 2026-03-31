@@ -434,6 +434,7 @@
             <label>Carrera</label>
             <select id="f_nivel">
               <option value="">Selecciona una carrera</option>
+              <option>Ingeniería Comercial</option>
               <option>Administración de Empresas</option>
               <option>Ingeniería de Sistemas</option>
               <option>Derecho</option>
@@ -477,6 +478,16 @@
               <option>Diálogo Inteligente</option>
               <option>Varias por igual</option>
               <option>Aún no ha explorado la app</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Materia con la que trabaja en el Coach</label>
+            <select id="f_materia">
+              <option value="">Selecciona una materia</option>
+              <option>Gestión de Ventas</option>
+              <option>Marketing Estratégico</option>
+              <option>Emprendimiento e Innovación</option>
+              <option>Otra materia</option>
             </select>
           </div>
         </div>
@@ -887,7 +898,7 @@ let SCRIPT_URL = localStorage.getItem('pedagoScriptUrl') || '';
 
 function guardarScriptUrl(){
   const url = document.getElementById('scriptUrlInput').value.trim();
-  if(!url || !url.startsWith('https://script.google.com')){
+  if(!url){
     showToast('Pega una URL válida de Apps Script','err'); return;
   }
   SCRIPT_URL = url;
@@ -936,6 +947,7 @@ async function submitSurvey(){
     est_semestre: document.getElementById('f_experiencia').value,
     frecuencia_app: document.getElementById('f_frecuencia').value,
     funcion_usada: document.getElementById('f_funcion_usada').value,
+    materia: document.getElementById('f_materia').value,
     q1_1_interfaz: getRadio('q1_1'),
     q1_2_autonavegacion: getRadio('q1_2'),
     q1_3_velocidad: getRadio('q1_3'),
