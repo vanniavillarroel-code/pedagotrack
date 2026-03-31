@@ -644,18 +644,7 @@
       <!-- SUBMIT -->
       <hr class="divider"/>
 
-      <!-- CONEXIÓN GOOGLE SHEETS -->
-      <div style="background:rgba(0,198,174,0.07);border:1px solid rgba(0,198,174,0.2);border-radius:12px;padding:18px 20px;margin-bottom:20px;">
-        <div style="font-size:0.85rem;font-weight:700;color:var(--accent);margin-bottom:4px;">🔗 Conectar con Google Sheets</div>
-        <div style="font-size:0.78rem;color:var(--muted);margin-bottom:12px;">Pega aquí la URL de tu Apps Script y haz clic en Guardar. Solo debes hacerlo una vez.</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
-          <div style="flex:1;min-width:260px;">
-            <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/..." style="width:100%;" />
-          </div>
-          <button class="btn btn-accent" onclick="guardarScriptUrl()" style="white-space:nowrap;">Guardar URL 💾</button>
-        </div>
-        <div id="sheets-status" style="margin-top:10px;font-size:0.78rem;color:var(--muted);">⚪ Sin configurar</div>
-      </div>
+
 
       <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="submitSurvey()" id="submitBtn">
@@ -886,27 +875,7 @@ function switchTab(tab) {
 // ──────────────────────────────────────────────
 // GOOGLE SHEETS URL
 // ──────────────────────────────────────────────
-let SCRIPT_URL = localStorage.getItem('pedagoScriptUrl') || '';
-
-(function initSheets(){
-  if(SCRIPT_URL){
-    document.getElementById('scriptUrlInput').value = SCRIPT_URL;
-    document.getElementById('sheets-status').innerHTML = '🟢 Conectado a Google Sheets';
-    document.getElementById('sheets-status').style.color = 'var(--success)';
-  }
-})();
-
-function guardarScriptUrl(){
-  const url = document.getElementById('scriptUrlInput').value.trim();
-  if(!url){
-    showToast('Pega una URL válida de Apps Script','err'); return;
-  }
-  SCRIPT_URL = url;
-  localStorage.setItem('pedagoScriptUrl', url);
-  document.getElementById('sheets-status').innerHTML = '🟢 Conectado a Google Sheets';
-  document.getElementById('sheets-status').style.color = 'var(--success)';
-  showToast('¡URL guardada! Ya puedes enviar respuestas ✅','ok');
-}
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLWTbvBjv-xy6PxQjvgoIb9qzhZeniuYr6mD3-Wj2TRQxVna-3tNxxQu4OMKmVKOF7/exec';
 
 // ──────────────────────────────────────────────
 // SURVEY SUBMIT
